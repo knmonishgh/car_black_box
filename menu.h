@@ -24,3 +24,6 @@ extern "C" {
 void menu_display();
 
 char menu_card[5][16] = {"View log","Clear log","download log","Set time","Change Password"};
+
+
+void view_log();

@@ -1,4 +1,4 @@
-/* 
+ /* 
  * File:   main.h
  * Author: monis
  *
@@ -8,7 +8,7 @@
 #ifndef MAIN_H
 #define	MAIN_H
 
-#ifdef	__cplusplus
+#ifdef	__cplusplus 
 extern "C" {
 #endif
 
@@ -29,13 +29,16 @@ typedef enum
     DASH,
     PASS,
     MENU,
+    LOG,      
 }Mode;
 
 
 unsigned char key;
-unsigned char gear_select;
+unsigned static char gear_select=0;
 unsigned char speed[2];
 unsigned char clear_flag=0;
+
+
 
 
 Mode board_mode = DASH;

@@ -21,7 +21,9 @@ extern "C" {
 
 #endif	/* DASHBOARD_H */
 
-void display_dashboard(char *gear_select, char *speed);
+void display_dashboard();
+
+void save_data();
 
 
 
