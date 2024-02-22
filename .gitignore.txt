@@ -5,19 +5,20 @@
 #include "menu.h"
 #include "main.h"
 
-unsigned static char mkey, menu_count = 0, temp_key = ALL_RELEASED;
-static char ch_flag = 0;
-static char reset = 0;
-static int longpress = 0;
-void readkey()
+void menu_display()
 {
+    unsigned static char mkey, menu_count = 0, temp_key = ALL_RELEASED;
+    static char ch_flag = 0;
+    static char reset = 0;
+    static short longpress = 0;
+
     mkey = read_switches(LEVEL_CHANGE);
     if (mkey == MK_SW11 || mkey == MK_SW12 && reset != 2)
     {
         reset = 1;
         longpress++;
         temp_key = mkey;
-        if (longpress > 500)
+        if (longpress > 300)
         {
             ch_flag = 2;
             reset = 2;
@@ -34,11 +35,7 @@ void readkey()
         reset = 0;
         longpress = 0;
     }
-}
 
-void menu_display()
-{
-    readkey();
     if (temp_key == MK_SW11 && ch_flag == 1 && menu_count > 0)
     {
         ch_flag = 0;
@@ -55,12 +52,9 @@ void menu_display()
     }
     if (temp_key == MK_SW11 && ch_flag == 2)
     {
-        ch_flag = 0;
         if (menu_count == 0)
         {
             CLEAR_DISP_SCREEN;
-            clcd_print("   View log  ", LINE1(0));
-            __delay_ms(2100);
             board_mode = LOG;
             return;
         }
@@ -91,34 +85,71 @@ void menu_display()
 
 void view_log()
 {
-    readkey();
-    unsigned static char read_buff[16];
-    unsigned static char view_index = 1,view_flag = 0;
+    static char is_pressed = 0;
+    unsigned static short press_duration = 0;
+    unsigned static char view_index = 1, view_flag = 0;
+    ;
+    static char switch_state, temp_switch_state, switch_flag = 0;
     unsigned static char eprom_read_addr = 0x00;
-    clcd_print("# TIME     E  SP", LINE1(0));
+    switch_state = read_switches(LEVEL_CHANGE);
+    unsigned static char read_buff[16];
 
-    if (temp_key == MK_SW11 && view_index < 9 && ch_flag == 1)
+    // Check if switch is pressed
+    if (switch_state == MK_SW11 || switch_state == MK_SW12)
     {
-        ch_flag = 0;
-        temp_key = ALL_RELEASED;
+
+        if (!is_pressed)
+        {
+            is_pressed = 1;
+            temp_switch_state = switch_state;
+            press_duration = 0;
+        }
+        else
+        {
+            press_duration++;
+            if (press_duration >= 300)
+            {
+                switch_flag = 2;
+
+                if (switch_state == ALL_RELEASED)
+                    is_pressed = 0;
+            }
+        }
+    }
+    else
+    {
+        if (is_pressed)
+        {
+            if (press_duration < 50)
+            {
+                switch_flag = 2;
+            }
+            is_pressed = 0;
+        }
+    }
+    for (int w = 500; w--;)
+        ;
+
+    // updating flags
+    if (temp_switch_state == MK_SW11 && switch_flag == 1 && view_index < 9)
+    {
+        temp_switch_state = ALL_RELEASED;
         view_index++;
         view_flag = 0;
     }
-    if (temp_key == MK_SW12 && view_index > 0 && ch_flag == 1)
+    if (temp_switch_state == MK_SW12 && switch_flag == 1 && view_index > 1)
     {
-        ch_flag = 0;
-        temp_key = ALL_RELEASED;
+        temp_switch_state = ALL_RELEASED;
         view_index--;
-        eprom_read_addr = eprom_read_addr - 24;
         view_flag = 0;
+        eprom_read_addr = eprom_read_addr - 24;
     }
-    if(temp_key == MK_SW12 && ch_flag == 2)
+    if (temp_switch_state == MK_SW12 && switch_flag == 2)
     {
         CLEAR_DISP_SCREEN;
         board_mode = MENU;
         return;
     }
-    
 
     if (view_flag == 0)
     {
