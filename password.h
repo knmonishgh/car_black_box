@@ -23,4 +23,6 @@ extern "C" {
 
 
 void password_screen();
-unsigned char pass[4] = {1,1,0,1};
+
+
+unsigned char pass[4];

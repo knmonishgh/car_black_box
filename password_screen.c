@@ -5,6 +5,7 @@
 #include <xc.h>
 #include <stdio.h>
 
+
 void password_screen() {
 
     unsigned static char pcount = 0;
@@ -64,7 +65,7 @@ void password_screen() {
                 pcount = 0;
                 pcount_pass = 0;
                 CLEAR_DISP_SCREEN;
-                clcd_print("Welcome", LINE1(1));
+                clcd_print("Welcome", LINE1(2));
                 clcd_print("Main Menu ", LINE2(2));
                 __delay_ms(2500);
                 CLEAR_DISP_SCREEN;
@@ -90,7 +91,7 @@ void password_screen() {
          if(t_wait++ == 100000)
          {
              CLEAR_DISP_SCREEN;
-             clear_flag = 0;
+             disp_clear_flag = 0;
              t_wait = 0;
              pcount = 0;
              pcount_pass = 0;
